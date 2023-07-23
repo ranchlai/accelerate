@@ -21,7 +21,7 @@ import os
 import re
 import shutil
 import tempfile
-from collections import defaultdict
+from collections import OrderedDict, defaultdict
 from typing import Dict, List, Optional, Tuple, Union
 
 import torch
@@ -881,7 +881,7 @@ def infer_auto_device_map(
             "The model weights are not tied. Please use the `tie_weights` method before using the `infer_auto_device` function."
         )
 
-    device_map = {}
+    device_map = OrderedDict()
     current_device = 0
     current_memory_used = 0
 
