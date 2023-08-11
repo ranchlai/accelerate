@@ -157,6 +157,8 @@ def add_hook_to_module(module: nn.Module, hook: ModelHook, append: bool = False)
 
     @functools.wraps(old_forward)
     def new_forward(*args, **kwargs):
+        # print("new forward")
+        # print(kwargs)
         args, kwargs = module._hf_hook.pre_forward(module, *args, **kwargs)
         if module._hf_hook.no_grad:
             with torch.no_grad():
@@ -181,7 +183,7 @@ def remove_hook_from_module(module: nn.Module, recurse=False):
         `torch.nn.Module`: The same module, with the hook detached (the module is modified in place, so the result can
         be discarded).
     """
-
+    import pdb; pdb.set_trace()
     if hasattr(module, "_hf_hook"):
         module._hf_hook.detach_hook(module)
         delattr(module, "_hf_hook")

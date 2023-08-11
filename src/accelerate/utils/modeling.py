@@ -859,7 +859,7 @@ def infer_auto_device_map(
     no_split_module_classes: Optional[List[str]] = None,
     dtype: Optional[Union[str, torch.dtype]] = None,
     special_dtypes: Optional[Dict[str, Union[str, torch.dtype]]] = None,
-    verbose: bool = False,
+    verbose: bool = True,
 ):
     """
     Compute a device map for a given model giving priority to GPUs, then offload on CPU and finally offload to disk,
@@ -977,7 +977,7 @@ def infer_auto_device_map(
             if verbose:
                 print(
                     f"Not enough space on {devices[current_device]} to put {name} (space available "
-                    f"{current_max_size-current_memory_used}, module size {module_size})."
+                    f"{current_max_size/10**9-current_memory_used/10**9:3.2f}GB, module size {module_size/10**9:3.2f}GB)."
                 )
             if len(modules_children) == 0 or module.__class__.__name__ in no_split_module_classes:
                 # -> no split, we go to the next device
@@ -1040,7 +1040,7 @@ def infer_auto_device_map(
                 if verbose:
                     print(
                         f"Not enough space on {devices[current_device]} to put {name} and {tied_module_names} (space "
-                        f"available {current_max_size-current_memory_used}, needed size {module_size_with_ties})."
+                        f"available {current_max_size/10**9-current_memory_used/10**9:3.2f}GB, needed size {module_size_with_ties/10**9:3.2f}GB)."
                     )
                 split_happened = False
                 for tied_module_name, tied_module in zip(tied_module_names, tied_modules):
@@ -1081,11 +1081,11 @@ def infer_auto_device_map(
         else:
             if verbose:
                 if current_max_size is None:
-                    print(f"Putting {name} (size={module_size}) on {devices[current_device]}.")
+                    print(f"Putting {name} (size={module_size/10**9:3.2f}GB) on {devices[current_device]}.")
                 else:
                     print(
-                        f"Putting {name} (size={module_size}) on {devices[current_device]} "
-                        f"(available={current_max_size-current_memory_used})."
+                        f"Putting {name} (size={module_size/10**9:3.2f}GB) on {devices[current_device]} "
+                        f"(available={current_max_size/10**9-current_memory_used/10**9:3.2f}GB)."
                     )
             current_memory_used += module_size
             device_map[name] = devices[current_device]
